@@ -6,3 +6,4 @@ streamlit
 requests
 datetime
 langchain_ollama
+pathlib
