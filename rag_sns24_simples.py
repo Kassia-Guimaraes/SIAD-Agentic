@@ -13,12 +13,15 @@ Antes de correr:
 # ─── PASSO 1: Importar as bibliotecas ─────────────────────────────────────────
 from langchain_community.document_loaders import TextLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_community.embeddings import OllamaEmbeddings
+#from langchain_community.embeddings import OllamaEmbeddings
 from langchain_community.vectorstores import Chroma
 from langchain_community.llms import Ollama
 from langchain_classic.chains import RetrievalQA
 from langchain_core.prompts import PromptTemplate
 
+from langchain_ollama import OllamaEmbeddings
+
+import requests
 
 # Passo 1 - Prompt Engineering: 
 
@@ -53,12 +56,31 @@ documentos = TextLoader("sns24_kb.txt", encoding="utf-8").load()
 chunks = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50).split_documents(documentos) #Overlap de 50 caracteres para manter contexto entre chunks Overlap muito grande → chunks muito parecidos, a BD fica redundante e lenta. Overlap muito pequeno → risco de perder contexto nas fronteiras.
 print(f"  → {len(chunks)} chunks criados")
 
+#testar a conexão com a máquina local, para utilizar o ollama
+print("Testando conexão com a máquina...")
+base_url = "http://localhost:11434"
+
+try:
+    r = requests.get(f"{base_url}/api/tags", timeout=10)
+    r.raise_for_status()
+    print("✅ Ollama respondeu")
+    print(r.json())
+except Exception as e:
+    print("❌ Falha ao ligar ao Ollama:", e)
+    raise
+
 # Converte cada chunk num vector numérico (embedding)
 # e guarda tudo numa base de dados vectorial (ChromaDB)
 print("A criar embeddings... (pode demorar 1-2 minutos na primeira vez)")
+
+embeddings = OllamaEmbeddings(
+    model="nomic-embed-text",
+    base_url=base_url
+)
+
 base_dados = Chroma.from_documents(
     documents=chunks,
-    embedding=OllamaEmbeddings(model="nomic-embed-text"),
+    embedding=embeddings,
     persist_directory="./chroma_sns24"  # guarda em disco
 )
 print("  → Base de dados pronta!")
