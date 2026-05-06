@@ -1,140 +1,128 @@
-"""
-rag_sns24_simples.py
---------------------
-Versão SIMPLES do chatbot RAG para o Projecto P2
-TIA/SIAD · Universidade do Minho · 2025/2026
+# rag_sns24_simples.py
 
-Antes de correr:
-    pip install langchain langchain-community chromadb ollama
-    ollama pull llama3.2
-    ollama pull nomic-embed-text
-"""
-
-# ─── PASSO 1: Importar as bibliotecas ─────────────────────────────────────────
 from langchain_community.document_loaders import TextLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-#from langchain_community.embeddings import OllamaEmbeddings
 from langchain_community.vectorstores import Chroma
 from langchain_community.llms import Ollama
 from langchain_classic.chains import RetrievalQA
 from langchain_core.prompts import PromptTemplate
-
 from langchain_ollama import OllamaEmbeddings
-
+from pathlib import Path
 import requests
 
-# Passo 1 - Prompt Engineering: 
-
-
-# O prompt é o "guia" que diz ao LLM como usar a informação dos protocolos SNS24 para responder às perguntas dos utilizadores.
-# No prompt temos dentro do mesmo variaveis que são preenchidas automaticamente pela LLM quando se cria o RetrievalQA. O {context} é preenchido com os 3 chunks mais relevantes encontrados na base de dados, e o {question} é preenchido com a pergunta do utilizador (os sintomas que ele escreve).
-prompt = PromptTemplate(
-    input_variables=["context", "question"],
-    template="""
-Usa os protocolos SNS24 abaixo para responder.
-Raciocina passo a passo ANTES de dar a classificação final.
-
-Protocolos: {context} 
-
-Sintomas: {question}
-
-Raciocínio:
-1. Que sintomas foram reportados?
-2. Existem sinais de alarme?
-3. Qual a urgência clínica?
-
-Resposta final: urgencia, encaminhamento, justificação
-"""
-)
-# ─── PASSO 2: Indexar o ficheiro de conhecimento (correr só 1 vez) ────────────
-print("A carregar os documentos SNS24...")
-
-# Carrega o ficheiro de texto com os protocolos
-documentos = TextLoader("sns24_kb.txt", encoding="utf-8").load()
-
-# Corta o texto em pedaços de ~500 caracteres (chunks)
-chunks = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50).split_documents(documentos) #Overlap de 50 caracteres para manter contexto entre chunks Overlap muito grande → chunks muito parecidos, a BD fica redundante e lenta. Overlap muito pequeno → risco de perder contexto nas fronteiras.
-print(f"  → {len(chunks)} chunks criados")
-
-#testar a conexão com a máquina local, para utilizar o ollama
-print("Testando conexão com a máquina...")
 base_url = "http://localhost:11434"
+chatbot = None
 
-try:
+def run_chuncks():
+    documentos = TextLoader("sns24_kb.txt", encoding="utf-8").load()
+    chunks = RecursiveCharacterTextSplitter(
+        chunk_size=500,
+        chunk_overlap=50
+    ).split_documents(documentos)
+    print("\n -> chunks prontos")
+
+    return chunks
+
+
+def inicializar_agent():
     r = requests.get(f"{base_url}/api/tags", timeout=10)
     r.raise_for_status()
-    print("✅ Ollama respondeu")
-    print(r.json())
-except Exception as e:
-    print("❌ Falha ao ligar ao Ollama:", e)
-    raise
 
-# Converte cada chunk num vector numérico (embedding)
-# e guarda tudo numa base de dados vectorial (ChromaDB)
-print("A criar embeddings... (pode demorar 1-2 minutos na primeira vez)")
+    prompt = PromptTemplate(
+        input_variables=["context", "question"],
+        template="""
+                És um assistente de triagem clínica baseado nos protocolos SNS24. 
+                O teu objetivo é:
+                1) conversar com o utilizador para perceber melhor a situação clínica
+                2) aplicar os protocolos SNS24 fornecidos em {context}
+                3) só depois disso dar uma recomendação final de urgência e encaminhamento.
 
-embeddings = OllamaEmbeddings(
-    model="nomic-embed-text",
-    base_url=base_url
-)
+                Regra geral:
+                - Fala em linguagem simples e respeitosa.
+                - Faz uma pergunta de cada vez.
+                - Se o utilizador der informação espontânea, aproveita-a e evita repetir perguntas.
 
-base_dados = Chroma.from_documents(
-    documents=chunks,
-    embedding=embeddings,
-    persist_directory="./chroma_sns24"  # guarda em disco
-)
-print("  → Base de dados pronta!")
+                Dados mínimos que deves tentar obter ANTES da resposta final:
+                - Idade do utente
+                - Sintomas principais (já em {question}, mas podes clarificar)
+                - Há quanto tempo começaram os sintomas
+                - Se os sintomas estão a piorar, a melhorar ou estáveis
+                - Medicação habitual e doenças crónicas importantes (ex.: coração, pulmões, diabetes, gravidez)
+                - Situação atual: consegue andar, falar em frases completas, beber líquidos, etc.
 
+                Fluxo da conversa:
 
+                1) Confirmar queixas principais
+                - Reescreve brevemente o que o utilizador disse e confirma: 
+                    "Percebi que está com {question}. É isso?"
 
+                2) Recolher dados essenciais
+                - Pergunta, em passos:
+                    - "Qual é a sua idade?"
+                    - "Há quanto tempo começaram estes sintomas?"
+                    - "Os sintomas estão a piorar, a melhorar ou mantêm-se iguais?"
+                    - "Tem algum problema de saúde importante (ex.: do coração, pulmões, rins, diabetes, está grávida, ou outro que considere relevante)?"
 
-# ─── PASSO 3: Criar o chatbot ──────────────────────────────────────────────────
-print("A carregar o LLM (llama3.2)...")
+                3) Procurar sinais de alarme (conforme protocolos SNS24 {context})
+                - Coloca perguntas específicas de alarme (exemplos genéricos, adaptar ao protocolo):
+                    - Dificuldade em respirar, dor no peito, alteração de consciência, febre muito alta e persistente, rigidez da nuca, dor súbita intensa, etc.
+                - Se identificar qualquer sinal de alarme grave, podes encurtar a entrevista e avançar mais depressa para a classificação de urgência.
 
-chatbot = RetrievalQA.from_chain_type(
-    llm=Ollama(model="llama3.2", temperature=0.1),  # temperatura baixa = mais consistente
-    retriever=base_dados.as_retriever(search_kwargs={"k": 3}),  # busca 3 chunks por pergunta, Com k=3, quando o utilizador escreve os sintomas, o retriever calcula a similaridade entre a pergunta e todos os chunks da BD, e devolve os 3 mais parecidos. Esses 3 chunks é que vão para o {context} do prompt.
-    chain_type_kwargs={"prompt": prompt}  # usa o prompt personalizado que criámos
-)
-print("  → Chatbot pronto!\n")
+                4) Só depois disto faz:
+                Raciocínio:
+                1. Que sintomas foram reportados?
+                2. Existem sinais de alarme?
+                3. Qual a urgência clínica?
 
+                Resposta final (usa SEMPRE este formato, sem texto extra):
+                - urgencia: [por exemplo: emergência / muito urgente / urgente / pouco urgente / aconselhamento / autocuidado]
+                - encaminhamento: [por exemplo: 112 / SU hospitalar / ADC / consulta SNS24 / contacto médico / autocuidado com vigilância]
+                - justificacao: [explica, em 2-4 frases, com base nos sintomas, sinais de alarme e protocolos {context}]
 
-# ─── PASSO 4: Fazer perguntas ──────────────────────────────────────────────────
-print("=" * 50)
-print("Chatbot SNS24 — escreve os teus sintomas")
-print("(escreve 'sair' para terminar)")
-print("=" * 50)
+                Se considerares que ainda faltam dados importantes para classificar pela grelha SNS24, continua a fazer perguntas antes da "Resposta final".
+                Nunca inventes dados que o utilizador não forneceu.
+                Se o utilizador disser explicitamente que não quer responder a algo, segue com o melhor possível com a informação disponível e menciona a limitação na justificação.
+                """
+    )
 
-while True:
-    sintomas = input("\nTu: ")
+    pasta_db = Path(".chroma_sns24")
 
-    if sintomas.lower() == "sair":
-        break
+    if pasta_db.exists() and pasta_db.is_dir():
+        base_dados = Chroma(
+            persist_directory=str(pasta_db),
+            embedding_function=OllamaEmbeddings(
+                model="nomic-embed-text",
+                base_url=base_url
+            )
+        )
+    else:
+        base_dados = Chroma.from_documents(
+            documents=run_chuncks(),
+            embedding=OllamaEmbeddings(
+                model="nomic-embed-text",
+                base_url=base_url
+            ),
+            persist_directory=str(pasta_db)
+        )
+    print("\n -> base de dados pronta")
 
-    # O chatbot:
-    # 1. Converte a tua pergunta em vector
-    # 2. Encontra os 3 chunks mais parecidos na BD
-    # 3. Envia os chunks + a pergunta ao LLM
-    # 4. O LLM gera a resposta
-    resposta = chatbot.invoke(sintomas)
-    print(f"\nSNS24-Bot: {resposta['result']}")
+    return prompt, base_dados
 
+def inicializar_chatbot(prompt=None, base_dados=None):
+    global chatbot
 
+    if chatbot is not None:
+        return chatbot
 
-"""
-Maneira convencional sem usar o RetrievalQA:
+    chatbot = RetrievalQA.from_chain_type(
+        llm=Ollama(model="tinyllama", temperature=0.1),
+        retriever=base_dados.as_retriever(search_kwargs={"k": 3}),
+        chain_type_kwargs={"prompt": prompt}
+    )
 
-# O que o RetrievalQA faz por ti, escrito à mão:
+    return chatbot
 
-# 1. Ir buscar os chunks
-pergunta = "Tenho febre há 3 dias"  -> User query
-chunks = base_dados.as_retriever().get_relevant_documents(pergunta)  - > Busca os 3 chunks mais relevantes para a pergunta "Tenho febre há 3 dias"
-contexto = "\n".join([c.page_content for c in chunks]) -> Junta os 3 chunks num único texto para o {context} do prompt
-
-# 2. Preencher o template
-prompt_preenchido = prompt.format(context=contexto, question=pergunta) -> Preenche o prompt com o contexto (os 3 chunks) e a pergunta do utilizador.
-
-# 3. Enviar ao LLM
-resposta = Ollama(model="llama3.2").invoke(prompt_preenchido)
-
-"""
+def perguntar_sns24(sintomas, prompt, base_dados):
+    bot = inicializar_chatbot(prompt, base_dados)
+    resposta = bot.invoke({"query": sintomas})
+    return resposta["result"]
