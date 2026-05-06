@@ -1,0 +1,7 @@
+langchain
+langchain-community
+chromadb
+ollama
+streamlit
+requests
+datetime
