@@ -22,6 +22,7 @@ from langchain_core.prompts import PromptTemplate
 from langchain_ollama import OllamaEmbeddings
 
 import requests
+from pathlib import Path
 
 # Passo 1 - Prompt Engineering: 
 
@@ -43,6 +44,8 @@ Raciocínio:
 2. Existem sinais de alarme?
 3. Qual a urgência clínica?
 
+Caso não tenha informações suficientes para a resposta final, pode realizar perguntas ao utilizador para obter mais detalhes.
+
 Resposta final: urgencia, encaminhamento, justificação
 """
 )
@@ -56,7 +59,8 @@ documentos = TextLoader("sns24_kb.txt", encoding="utf-8").load()
 chunks = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50).split_documents(documentos) #Overlap de 50 caracteres para manter contexto entre chunks Overlap muito grande → chunks muito parecidos, a BD fica redundante e lenta. Overlap muito pequeno → risco de perder contexto nas fronteiras.
 print(f"  → {len(chunks)} chunks criados")
 
-#testar a conexão com a máquina local, para utilizar o ollama
+
+# ─── testar a conexão com a máquina local, para utilizar o ollama ────────────
 print("Testando conexão com a máquina...")
 base_url = "http://localhost:11434"
 
@@ -64,7 +68,6 @@ try:
     r = requests.get(f"{base_url}/api/tags", timeout=10)
     r.raise_for_status()
     print("✅ Ollama respondeu")
-    print(r.json())
 except Exception as e:
     print("❌ Falha ao ligar ao Ollama:", e)
     raise
@@ -73,18 +76,23 @@ except Exception as e:
 # e guarda tudo numa base de dados vectorial (ChromaDB)
 print("A criar embeddings... (pode demorar 1-2 minutos na primeira vez)")
 
-embeddings = OllamaEmbeddings(
-    model="nomic-embed-text",
-    base_url=base_url
-)
+pasta_db = Path("./chroma_sns24")
 
-base_dados = Chroma.from_documents(
-    documents=chunks,
-    embedding=embeddings,
-    persist_directory="./chroma_sns24"  # guarda em disco
-)
-print("  → Base de dados pronta!")
+if pasta_db.exists() and pasta_db.is_dir():
+    print("Base vetorial já existe. A carregar do disco...")
+    base_dados = Chroma(
+        persist_directory=str(pasta_db),
+        embedding_function=OllamaEmbeddings(model="nomic-embed-text", base_url=base_url)
+    )
+else:
+    print("Base vetorial não existe. A criar embeddings...")
+    base_dados = Chroma.from_documents(
+        documents=chunks,
+        embedding=OllamaEmbeddings(model="nomic-embed-text", base_url=base_url),
+        persist_directory=str(pasta_db)
+    )
 
+print("→ Base de dados pronta!")
 
 
 
@@ -117,7 +125,7 @@ while True:
     # 3. Envia os chunks + a pergunta ao LLM
     # 4. O LLM gera a resposta
     resposta = chatbot.invoke(sintomas)
-    print(f"\nSNS24-Bot: {resposta['result']}")
+    print(f"\nSNS24-Bot: {resposta}")
 
 
 
