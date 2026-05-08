@@ -4,7 +4,8 @@ from pathlib import Path
 import os
 import json
 import requests
-
+import sqlite3
+from datetime import datetime
 from dotenv import load_dotenv
 
 from langchain_community.document_loaders import TextLoader
@@ -149,7 +150,7 @@ def extrair_texto_iaedu(resposta):
     return resposta.text.strip()
 
 
-def chamar_iaedu(prompt):
+def chamar_iaedu(prompt, session_id):
 
     headers = {
         "x-api-key": IAEDU_API_KEY,
@@ -158,7 +159,7 @@ def chamar_iaedu(prompt):
 
     data = {
         "message": prompt,
-        "thread_id": "siad-sns24-thread-001",
+        "thread_id": session_id,
         "channel_id": IAEDU_CHANNEL_ID,
         "user_info": json.dumps({
             "id": "user_001",
@@ -190,25 +191,111 @@ def chamar_iaedu(prompt):
 
     return extrair_texto_iaedu(resposta)
 
+def gerar_titulo_com_ia(pergunta, resposta, session_id):
+    """Pede à IA para resumir a triagem num título de 3 a 5 palavras."""
+    prompt_resumo = f"""
+    Baseado nesta triagem, gera um título muito curto e profissional (máximo 5 palavras).
+    NÃO uses pontuação final. Sê direto.
+    
+    Pergunta: {pergunta}
+    Resposta: {resposta}
+    
+    Título:"""
+    
+    try:
+        # Chamamos a mesma função de IA 
+        titulo = chamar_iaedu(prompt_resumo, session_id)
+        # Limpamos possíveis aspas ou lixo que a IA envie
+        return titulo.replace('"', '').replace('.', '').strip()
+    except:
+        return "Nova Triagem"
+    
+def registar_na_bd(pergunta, resposta, session_id):
+    conn = sqlite3.connect('historico_triagem.db')
+    cursor = conn.cursor()
+    
+    # 1. Tabela de Mensagens (Histórico detalhado)
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS interacoes (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            session_id TEXT,
+            data_hora TEXT,
+            pergunta_utente TEXT,
+            resposta_sistema TEXT
+        )
+    ''')
 
-def perguntar_sns24(sintomas, prompt_template, base_dados):
+    # 2. Tabela de Sessões (Para a barra lateral)
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS sessoes (
+            session_id TEXT PRIMARY KEY,
+            titulo TEXT,
+            data_criacao TEXT
+        )
+    ''')
+
+    # Verifica se a sessão já tem título; se não, gera um
+    # Verifica se a sessão é nova
+    cursor.execute("SELECT titulo FROM sessoes WHERE session_id = ?", (session_id,))
+    if not cursor.fetchone():
+        # ---  USAMOS A IA PARA O TÍTULO ---
+        titulo_ia = gerar_titulo_com_ia(pergunta, resposta, session_id)
+        
+        cursor.execute(
+            "INSERT INTO sessoes (session_id, titulo, data_criacao) VALUES (?, ?, ?)",
+            (session_id, titulo_ia, datetime.now().strftime("%Y-%m-%d %H:%M"))
+        )
+    
+    # Guarda a interação normal
+    cursor.execute(
+        "INSERT INTO interacoes (session_id, data_hora, pergunta_utente, resposta_sistema) VALUES (?, ?, ?, ?)",
+        (session_id, datetime.now().strftime("%Y-%m-%d %H:%M:%S"), pergunta, resposta)
+    )
+    conn.commit()
+    conn.close()
+
+def perguntar_sns24(sintomas, prompt_template, base_dados, session_id):
     retriever = base_dados.as_retriever(search_kwargs={"k": 3})
-
     docs = retriever.invoke(sintomas)
 
-    contexto = "\n\n---\n\n".join(
-        [doc.page_content for doc in docs]
-    )
+    contexto = "\n\n---\n\n".join([doc.page_content for doc in docs])
 
     prompt_final = prompt_template.format(
         context=contexto,
         question=sintomas
     )
 
-    resposta = chamar_iaedu(prompt_final)
+    # 1. Obtém a resposta da IA
+    resposta = chamar_iaedu(prompt_final, session_id)
+    
+    # 2. guardar na bd
+    try:
+        registar_na_bd(sintomas, resposta, session_id)
+    except Exception as e:
+        print(f"Erro ao guardar na BD: {e}")
 
     return resposta
 
+def obter_todas_sessoes():
+    conn = sqlite3.connect('historico_triagem.db')
+    cursor = conn.cursor()
+    try:
+        # Lê o título e o ID da nova tabela 'sessoes'
+        cursor.execute("SELECT session_id, titulo FROM sessoes ORDER BY data_criacao DESC")
+        sessoes = cursor.fetchall()
+    except:
+        sessoes = []
+    conn.close()
+    return sessoes
+
+def obter_mensagens_sessao(session_id):
+    """Retorna todas as perguntas e respostas de uma sessão específica."""
+    conn = sqlite3.connect('historico_triagem.db')
+    cursor = conn.cursor()
+    cursor.execute("SELECT pergunta_utente, resposta_sistema FROM interacoes WHERE session_id = ?", (session_id,))
+    mensagens = cursor.fetchall()
+    conn.close()
+    return mensagens
 
 def inicializar_agent():
     prompt = criar_prompt()

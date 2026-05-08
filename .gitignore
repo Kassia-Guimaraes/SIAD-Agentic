@@ -20,3 +20,6 @@ env/
 # Sistema
 .DS_Store
 Thumbs.db
+
+# Base de dados de interações local
+historico_triagem.db
