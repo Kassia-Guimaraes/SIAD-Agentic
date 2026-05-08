@@ -10,7 +10,24 @@ from langchain_ollama import OllamaEmbeddings
 from pathlib import Path
 import requests
 
+from pathlib import Path
+import os
+import json
+import requests
+
+from dotenv import load_dotenv
+
+load_dotenv()
+
+# API IAedu
+IAEDU_URL = os.getenv("IAEDU_URL")
+IAEDU_API_KEY = os.getenv("IAEDU_API_KEY")
+IAEDU_CHANNEL_ID = os.getenv("IAEDU_CHANNEL_ID")
+
 base_url = "http://localhost:11434"
+pasta_db = Path("chroma_sns24_bge-m3")
+EMBEDDING_MODEL = "bge-m3"
+
 chatbot = None
 
 def run_chuncks():
@@ -85,13 +102,11 @@ def inicializar_agent():
                 """
     )
 
-    pasta_db = Path(".chroma_sns24")
-
     if pasta_db.exists() and pasta_db.is_dir():
         base_dados = Chroma(
             persist_directory=str(pasta_db),
             embedding_function=OllamaEmbeddings(
-                model="nomic-embed-text",
+                model=EMBEDDING_MODEL,
                 base_url=base_url
             )
         )
@@ -99,7 +114,7 @@ def inicializar_agent():
         base_dados = Chroma.from_documents(
             documents=run_chuncks(),
             embedding=OllamaEmbeddings(
-                model="nomic-embed-text",
+                model=EMBEDDING_MODEL,
                 base_url=base_url
             ),
             persist_directory=str(pasta_db)
@@ -115,7 +130,7 @@ def inicializar_chatbot(prompt=None, base_dados=None):
         return chatbot
 
     chatbot = RetrievalQA.from_chain_type(
-        llm=Ollama(model="tinyllama", temperature=0.1),
+        llm=Ollama(model="phi4-mini", temperature=0.1), #tinyllama
         retriever=base_dados.as_retriever(search_kwargs={"k": 3}),
         chain_type_kwargs={"prompt": prompt}
     )
@@ -125,4 +140,4 @@ def inicializar_chatbot(prompt=None, base_dados=None):
 def perguntar_sns24(sintomas, prompt, base_dados):
     bot = inicializar_chatbot(prompt, base_dados)
     resposta = bot.invoke({"query": sintomas})
-    return resposta["result"]
+    return resposta#["result"]
