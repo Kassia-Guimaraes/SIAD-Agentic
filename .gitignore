@@ -1,0 +1,22 @@
+# Variáveis de ambiente / chaves privadas
+.env
+*.env
+
+# Base vetorial local
+chroma_sns24_bge-m3/
+
+# Cache Python
+__pycache__/
+*.pyc
+
+# Ambientes virtuais
+.venv/
+venv/
+env/
+
+# VS Code opcional
+.vscode/
+
+# Sistema
+.DS_Store
+Thumbs.db
