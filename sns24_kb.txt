@@ -3,70 +3,101 @@
 # Fonte: Adaptado dos protocolos públicos SNS24 / Linha de Saúde
 # ============================================================
 
+## CRITERIO IDADE
+- Idade inferior ou igual a 3 anos → Bebe
+- Idade entre os 4 e os 18 anos → Criança
+- Idade entre os 19 e os 60 anos → Adulto 
+- Idade superior a 60 anos → Senior
+
+-----------------------------------------------------------------------------
 ## PROTOCOLO: DOR NO PEITO
 
 ### Sintomas de EMERGÊNCIA (ligar 112 imediatamente)
 - Dor no peito com irradiação para o braço esquerdo, mandíbula ou costas
-- Dor intensa no peito com suor frio e náuseas
-- Dor no peito com falta de ar severa e lábios azulados
-- Dor no peito em doente com historial cardíaco
-- Palpitações com perda de consciência
+- Dor no peito intensa como um aperto há mais de 20 minutos
+- Dor intensa no peito com suor frio, náuseas ou tonturas
+- Dor no peito intensa com falta de ar severa e lábios azulados
+- Dor no peito intensa em doente com historial cardíaco
+- Perda de consciência no momento
 - Pressão ou aperto no peito que não passa em repouso
+- Perda de força em algum membro, fala arrastada ou desvio do lábio 
 
-### Sintomas URGENTES (ir ao Serviço de Urgência nas próximas 2h)
+### Sintomas URGENTES (ir ao Serviço de Urgência nas próximas 4h)
 - Dor no peito que piora com o esforço
 - Dor no peito com taquicardia (>100 bpm)
 - Dor no peito com história de hipertensão não controlada
+- Dor no peito que agrava com respiração profunda e que provoca dificuldade em respirar
 
-### Sintomas de CONSULTA (médico de família em 24-48h)
-- Dor torácica tipo muscular, agravada com palpação
+### Sintomas de CONSULTA (centro de saúde em 24-48h)
+- Dor torácica tipo muscular, agravada com palpação ou com certos movimentos
 - Dor intercostal após esforço físico
 - Dor leve e passageira sem outros sintomas associados
 
-### Encaminhamento
-- EMERGÊNCIA → 112 / INEM
-- URGENTE → Serviço de Urgência Hospitalar
-- CONSULTA → Médico de família / Centro de Saúde
 
----
-
+-----------------------------------------------------------------------------
 ## PROTOCOLO: DIFICULDADE RESPIRATÓRIA / FALTA DE AR
 
 ### Sintomas de EMERGÊNCIA
-- Falta de ar súbita e severa em repouso
 - Cianose (lábios ou unhas azuladas)
 - Incapacidade de completar frases por falta de ar
 - Criança com tiragem (esforço respiratório visível)
 - Falta de ar com estridor (som de aperto ao respirar)
-- Saturação O2 <90% (se medida)
+- Saturação O2 <90% (se medida) e sinais de dificuldade respiratória
+- Dificuldade respiratória grave: lábios roxos, respiração ofegante, apneia ou respiração ruidosa.
+- Exposição a substâncias tóxicas: lixivias, pesticidas, entre outros
 
 ### Sintomas URGENTES
 - Falta de ar que piora progressivamente
-- Sibilância (pieira) não controlada com broncodilatador habitual
+- Sibilância (pieira) incapacitante, não controlada com broncodilatador habitual
 - Falta de ar com febre alta (>39°C)
 - Doente asmático sem melhoria após inalador
+- Hemoptises (expetoração com sangue)
+- Dificuldade em respirar ligeira em Bebe ou Senior
+- Tosse persistente com dor no peito ou pieira associada, em Bebe ou Senior
+- Tosse persistente em Bebe
+- Dificuldade em respirar e dor no peito ligeira em doente com historial respiratório
 
 ### Sintomas de CONSULTA
 - Tosse crónica com ligeira falta de ar ao esforço
 - Dispneia leve após esforço intenso, sem outros sintomas
+- Tosse há mais de 15 dias
+- Pieira ligeira, que não seja incapacitante
+- Tosse persistente em criança, adulto ou senior
+- Tosse com expetoração esverdeada ou acastanhada
 
 ### AUTO-CUIDADO
 - Tosse seca ocasional sem falta de ar
 - Ligeira obstrução nasal sem dificuldade respiratória
+- Congestão nasal ligeira
 
----
-
+-----------------------------------------------------------------------------
 ## PROTOCOLO: FEBRE
 
+### Sintomas URGENTES
+- Febre > 40°C em qualquer idade → URGENTE
+- Febre e sinais de desidratação, em qualquer idade: urina muito concentrada, diminuição do débito urinário, boca seca ou tonturas → URGENTE
+
 ### Critérios de idade e temperatura
+**Bebés <6 meses:**
+- Qualquer febre >38°C → EMERGÊNCIA 
+- Febre com convulsão → EMERGÊNCIA
+- Febre com manchas purpúricas na pele → EMERGÊNCIA (112)
+- Febre baixa (<38°C) com sintomas leves → AUTO-CUIDADO
 
-**Crianças <3 meses:**
-- Qualquer febre >38°C → EMERGÊNCIA (ir imediatamente ao SU pediátrico)
-
-**Crianças 3-36 meses:**
+**Bebés 6-36 meses:**
 - Febre >39°C sem causa identificada → URGENTE
 - Febre com convulsão → EMERGÊNCIA (112)
 - Febre com manchas purpúricas na pele → EMERGÊNCIA (112)
+- Febre >37,6°C com mais de 5 dias sem melhoria → URGENTE
+- Febre >37,6°C com mais de 3 dias sem melhoria → CONSULTA
+- Febre baixa (<37.6°C) com sintomas leves → AUTO-CUIDADO
+
+**Criança:**
+- Febre >39.5°C com rigidez da nuca → EMERGÊNCIA (meningite)
+- Febre >38.5°C com confusão mental → URGENTE
+- Febre >37,6°C com mais de 5 dias sem melhoria → URGENTE
+- Febre >37,6°C com mais de 3 dias sem melhoria → CONSULTA
+- Febre baixa (<37.6°C) com sintomas leves → AUTO-CUIDADO
 
 **Adultos:**
 - Febre >39.5°C com rigidez da nuca → EMERGÊNCIA (meningite)
@@ -74,20 +105,22 @@
 - Febre >38°C com mais de 5 dias sem melhoria → CONSULTA
 - Febre baixa (<38.5°C) com sintomas leves → AUTO-CUIDADO
 
-### Medidas de auto-cuidado para febre leve
-- Paracetamol 1g cada 6-8h (adultos)
+
+### Medidas de auto-cuidado para febre baixa
+- Paracetamol 1g a cada 6-8h (adultos) no máximo 3 dias
 - Hidratação abundante (água, chás)
 - Repouso
-- Reavaliar em 24-48h se não melhorar
+- Reavaliar em 72h se não melhorar
 
----
 
+-----------------------------------------------------------------------------
 ## PROTOCOLO: DOR DE CABEÇA / CEFALEIA
 
 ### Sintomas de EMERGÊNCIA ("pior dor de cabeça da vida")
 - Dor de cabeça súbita e muito intensa (thunderclap headache) → suspeita de hemorragia subaracnoideia
 - Dor de cabeça com rigidez da nuca e febre → meningite
 - Dor de cabeça com alteração do estado de consciência
+- Perda de consciência no momento
 - Dor de cabeça com fraqueza ou dormência de um lado do corpo → AVC
 - Dor de cabeça com alterações visuais súbitas
 - Cefaleia após traumatismo craniano
@@ -102,8 +135,8 @@
 - Enxaqueca conhecida com padrão habitual
 - Dor de cabeça leve após má noite de sono ou stress
 
----
 
+-----------------------------------------------------------------------------
 ## PROTOCOLO: DOR ABDOMINAL
 
 ### Sintomas de EMERGÊNCIA
@@ -116,19 +149,31 @@
 ### Sintomas URGENTES
 - Dor abdominal intensa localizada no quadrante inferior direito (suspeita de apendicite)
 - Dor epigástrica intensa em doente com história de úlcera péptica
-- Dor abdominal com impossibilidade de andar direito
+- Dor abdominal intensa com impossibilidade de andar direito
+- Diarreia ou vómitos e sinais de desidratação, em qualquer idade: urina muito concentrada, diminuição do débito urinário, boca seca ou tonturas
+- Vómitos persistentes, há mais de 12h e não tolera qualquer alimento (sólido ou liquido)
+- Diarreia superior a 3 dias, e com alta frequência (em 24h, superior a 6 dejeções) - Risco elevado de desidratação
+- Dor abdominal, diarreia mais de 3 dias e febre mais de 3 dias em Bebe ou Senior 
 
 ### Sintomas de CONSULTA
 - Dor abdominal recorrente sem sinais de alarme
 - Cólicas menstruais intensas
 - Dor abdominal com alteração do trânsito intestinal (obstipação/diarreia)
+- Dor abdominal, diarreia mais de 3 dias e febre mais de 3 dias em Criança ou Adulto 
+- Dor abdominal, diarreia mais de 3 dias (baixa frequência - em 24h, inferior a 6 dejeções) e febre
+- Diarreia superior a 3 dias, e com alta frequência (em 24h, superior a 6 dejeções) - Risco elevado de desidratação
+- Dor abdominal ligeira com vómitos ocasionais
+- Dor abdominal ligeira em Bebe
+- Vómitos ocasionais e há apenas 12h em Bebe ou Senior 
 
 ### AUTO-CUIDADO
 - Desconforto abdominal leve após refeição
 - Gases e distensão abdominal sem outros sintomas
+- Dor abdominal ligeira e diarreia há menos de 3 dias
+- Vómitos ocasionais e há apenas 12h em Criança ou Adulto
+- Diarreia baixa frequência há menos de 3 dias
 
----
-
+-----------------------------------------------------------------------------
 ## PROTOCOLO: TONTURAS / VERTIGENS
 
 ### Sintomas de EMERGÊNCIA
@@ -138,7 +183,7 @@
 - Síncope (desmaio) completo sem causa evidente
 
 ### Sintomas URGENTES
-- Vertigem intensa com vómitos persistentes e impossibilidade de manter equilíbrio
+- Vertigem intensa com vómitos persistentes
 - Tontura em doente cardíaco com palpitações
 
 ### AUTO-CUIDADO / CONSULTA
@@ -146,46 +191,46 @@
 - Tontura leve após levantar rapidamente (hipotensão ortostática)
 - Tonturas em contexto de jejum prolongado
 
----
 
+-----------------------------------------------------------------------------
 ## PROTOCOLO: SINTOMAS URINÁRIOS
 
-### Sintomas URGENTES / EMERGÊNCIA
+### Sintomas URGENTES
 - Retenção urinária aguda (incapacidade de urinar com bexiga cheia)
 - Dor lombar intensa com febre e calafrios (pielonefrite)
-- Hematúria macroscópica (sangue visível na urina) em adulto >40 anos
+- Hematúria macroscópica (sangue visível na urina) em Adulto ou Senior
 
 ### Sintomas de CONSULTA
-- Disúria (ardor ao urinar) com polaquiúria (urinar muitas vezes) sem febre
-- Infecção urinária baixa sem complicações (cistite)
+- Disúria (ardor ao urinar) com polaquiúria (urinar muitas vezes)
 
 ### AUTO-CUIDADO (se sem febre, sem dor lombar)
 - Beber bastante água (>2L/dia)
 - Evitar cafeína e álcool
 - Reavaliar em 48h se não melhorar → consulta
 
----
 
+-----------------------------------------------------------------------------
 ## PROTOCOLO: TRAUMATISMOS / QUEDAS
 
 ### EMERGÊNCIA (112)
 - Traumatismo craniano com perda de consciência
 - Suspeita de fractura de coluna (dor cervical ou lombar após queda, formigueiros nos membros)
 - Fractura exposta (osso visível)
-- Hemorragia não controlável
-- Traumatismo em criança pequena (<2 anos) com qualquer queda
+- Hemorragia ativa: perda de sangue ativa há 10minutos ou mais, que não estanca com pressão
 
 ### URGENTE
 - Suspeita de fractura de membro (deformidade, impotência funcional, dor intensa)
 - Ferida profunda com necessidade de sutura
 - Traumatismo no tórax com dor à respiração
+- Entorse com edema e dor intensa
+- Traumatismo craniano com vómitos frequentes
 
 ### CONSULTA
 - Entorse com edema e dor moderada
 - Contusão sem deformidade
 
----
 
+-----------------------------------------------------------------------------
 ## PROTOCOLO: ALERGIAS / REACÇÕES ALÉRGICAS
 
 ### EMERGÊNCIA (Anafilaxia — 112)
@@ -198,23 +243,26 @@
 - Urticária extensa de início súbito sem comprometimento respiratório
 - Reacção cutânea intensa a medicamento (ampolhas, esfoliação)
 
+### CONSULTA
+- Rash cutâneo com ligeiro prurido
+
 ### AUTO-CUIDADO
 - Urticária leve localizada (antihistamínico oral)
 - Rinite alérgica sazonal sem complicações
 
----
 
+-----------------------------------------------------------------------------
 ## TABELA RESUMO DE ENCAMINHAMENTOS
 
 | Urgência | Encaminhamento | Tempo |
 |---|---|---|
-| EMERGÊNCIA | 112 / INEM ou SU imediatamente | Agora |
-| URGENTE | Serviço de Urgência | <2 horas |
-| CONSULTA | Médico de família / SNS24 | 24-48 horas |
+| EMERGÊNCIA | 112 / INEM | Agora |
+| URGENTE | Serviço de Urgência (SU) | <4 horas |
+| CONSULTA | Centro de Saúde (CSP) | 24-48 horas |
 | AUTO-CUIDADO | Tratamento em casa + reavaliação | Monitorizar |
 
----
 
+-----------------------------------------------------------------------------
 ## NOTA SOBRE O SISTEMA SNS24
 
 O SNS24 é o serviço nacional de saúde 24h de Portugal, acessível pelo número 808 24 24 24.
