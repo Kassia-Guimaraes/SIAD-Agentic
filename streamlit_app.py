@@ -36,6 +36,10 @@ if "ultima_pergunta" not in st.session_state:
 if "ultima_resposta" not in st.session_state:
     st.session_state.ultima_resposta = None
 
+if "conversa_finalizada" not in st.session_state:
+    st.session_state.conversa_finalizada = False
+    
+
 # Dicionário com textos da interface
 TEXTOS = {
     "Português": {
@@ -54,7 +58,8 @@ TEXTOS = {
         "mais_info": "Deseja mais alguma informação?",
         "sim": "Sim",
         "nao": "Não",
-        "escreva_extra": "Pode escrever a sua dúvida abaixo."
+        "escreva_extra": "Pode escrever a sua dúvida abaixo.",
+        "finalizado": "Atendimento finalizado. Para iniciar uma nova triagem, clique em 'Nova Conversa'."
     },
     "English": {
         "titulo": "SNS24 Chatbot",
@@ -72,7 +77,8 @@ TEXTOS = {
         "mais_info": "Would you like any further information?",
         "sim": "Yes",
         "nao": "No",
-        "escreva_extra": "You can write your question below."
+        "escreva_extra": "You can write your question below.",
+        "finalizado": "Session completed. To start a new triage, click 'New Conversation'."
     },
     "Español": {
         "titulo": "Chatbot SNS24",
@@ -90,7 +96,8 @@ TEXTOS = {
         "mais_info": "¿Desea más información?",
         "sim": "Sí",
         "nao": "No",
-        "escreva_extra": "Puede escribir su duda abajo."
+        "escreva_extra": "Puede escribir su duda abajo.",
+        "finalizado": "Atención finalizada. Para iniciar un nuevo triaje, haga clic en 'Nueva Conversa'."
     }
 }
 
@@ -106,6 +113,7 @@ with st.sidebar:
         st.session_state.mostrar_pergunta_final = False
         st.session_state.avaliacao_enviada = False
         st.session_state.nota_avaliacao = None
+        st.session_state.conversa_finalizada = False
         st.rerun()
 
     st.divider()
@@ -122,6 +130,7 @@ with st.sidebar:
             st.session_state.mostrar_avaliacao = False
             st.session_state.avaliacao_enviada = False
             st.session_state.nota_avaliacao = None
+            st.session_state.conversa_finalizada = False
             
             for p, r in mensagens:
                 st.session_state.historico.append({"role": "user", "content": p})
@@ -256,7 +265,13 @@ for msg in st.session_state.historico:
 
         st.write(msg["content"])
 
-pergunta = st.chat_input(t["placeholder"])
+if st.session_state.conversa_finalizada:
+    st.info(t["finalizado"])
+
+pergunta = st.chat_input(
+    t["placeholder"],
+    disabled=st.session_state.conversa_finalizada
+    )
 
 
 if pergunta:
@@ -407,6 +422,7 @@ if st.session_state.mostrar_avaliacao:
                 ):
                     st.session_state.nota_avaliacao = 3
                     st.session_state.avaliacao_enviada = True
+                    st.session_state.conversa_finalizada = True
 
                     guardar_avaliacao(
                         session_id=st.session_state.session_id,
@@ -425,6 +441,7 @@ if st.session_state.mostrar_avaliacao:
                 ):
                     st.session_state.nota_avaliacao = 2
                     st.session_state.avaliacao_enviada = True
+                    st.session_state.conversa_finalizada = True
 
                     guardar_avaliacao(
                         session_id=st.session_state.session_id,
@@ -443,6 +460,7 @@ if st.session_state.mostrar_avaliacao:
                 ):
                     st.session_state.nota_avaliacao = 1
                     st.session_state.avaliacao_enviada = True
+                    st.session_state.conversa_finalizada = True
 
                     guardar_avaliacao(
                         session_id=st.session_state.session_id,
