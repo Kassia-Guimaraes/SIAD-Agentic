@@ -8,3 +8,4 @@ datetime
 langchain_ollama
 pathlib
 langchain_chroma
+dotenv
