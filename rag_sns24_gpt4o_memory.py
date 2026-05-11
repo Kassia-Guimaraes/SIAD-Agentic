@@ -1,5 +1,3 @@
-# rag_sns24_simples.py
-
 from pathlib import Path
 import os
 import json
@@ -8,6 +6,7 @@ import sqlite3
 import uuid
 from datetime import datetime
 from dotenv import load_dotenv
+import time
 
 from langchain_community.document_loaders import TextLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
@@ -385,6 +384,7 @@ def formatar_historico_sessao(session_id, limite=6):
 
 def perguntar_sns24(sintomas, prompt_template, base_dados, session_id):
     retriever = base_dados.as_retriever(search_kwargs={"k": 3})
+    print("LLM Call")
     docs = retriever.invoke(sintomas)
 
     contexto = "\n\n---\n\n".join([doc.page_content for doc in docs])
