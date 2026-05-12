@@ -79,7 +79,7 @@
 
 ### Critérios de idade e temperatura
 **Bebés <6 meses:**
-- Qualquer febre >38°C → EMERGÊNCIA 
+- Qualquer febre >38°C → URGENTE
 - Febre com convulsão → EMERGÊNCIA
 - Febre com manchas purpúricas na pele → EMERGÊNCIA (112)
 - Febre baixa (<38°C) com sintomas leves → AUTO-CUIDADO
